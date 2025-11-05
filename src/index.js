@@ -9,12 +9,15 @@ const routes = require('./routes/routes');
 const db = require('./db/db');                                 //Módulo de conexão com o banco de dados
 
 const clienteRoutes = require('./routes/clienteroutes');       //Importa as rotas de clientes
+const produtoRoutes = require(`./routes/produtoroutes`);
+const loginRoutes = require('./routes/loginroutes');
 const corsOptions = {
 
     origin: ['http://localhost:3333', 'https://meudominio.com'], // Lista de origens permitidas
-    methods: 'GET, POST, PUT, DELETE', //Métodos HTTP permitidos
+    methods: 'GET, POST, PUT,PATCH, DELETE', //Métodos HTTP permitidos
     credentials: true, // Permite envio de cookies 
 }
+
 
 const app = express();                                          // Inicialização do aplicativo
 
@@ -38,6 +41,8 @@ app.get('/', (req, res) => {
 
 // Configuração de rotas
 app.use('/', clienteRoutes); 
+app.use(`/`, produtoRoutes);
+app.use(`/`, loginRoutes);
 
 // Configuração de rotas
 app.use('/', routes);
@@ -46,7 +51,7 @@ app.use('/', routes);
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Algo deu errado!');
-})
+});
 
 // Inicialização do servidor
 const PORT = process.env.PORT || 3333;

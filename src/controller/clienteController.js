@@ -1,7 +1,7 @@
 const db = require('../db/db'); // Módulo de conexão com o banco de dados
 const Joi = require('joi'); // Biblioteca de validação de dados
 const bcrypt = require('bcrypt'); // Para encriptação de senhas
-const { error } = require('console');
+
 
 // Validação com Joi
 const clienteSchema = Joi.object({
@@ -23,7 +23,7 @@ exports.listarClientes = async (req, res) => {
         const [result] = await db.query('SELECT * FROM cliente');
         res.json(result) // Aqui retornamos apenas os dados da consulta
 
-    } catch (err) {
+    } catch (err) { 
         console.error('Erro ao buscar clientes :', err);
         res.status(500).json({ error: 'Erro interno do servidor' });
     }
@@ -81,7 +81,7 @@ exports.atualizarCliente = async (req, res) => {
     const { nome, endereco, bairro, cidade, telefone, senha } = req.body;
 
     // Validação de dados
-    const { error } = clienteSchema.validate({ cpf, nome, endereco, bairro, cidade, senha });
+    const { error } = clienteSchema.validate({ cpf, nome, endereco, telefone, bairro, cidade, senha });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
@@ -104,6 +104,10 @@ exports.atualizarCliente = async (req, res) => {
 exports.deletarCliente = async (req, res) => {
     const { cpf } = req.params;
     try {
+        const[result] = await db.query('SELECT * FROM cliente WHERE cpf = ?', [cpf]);
+        if (result.length===0) {
+            return res.status(404).json({ error : 'Cliente não encontrado'});
+        }
         await db.query('DELETE FROM cliente WHERE cpf = ?', [cpf]);
         res.json({ message: 'Cliente deletado com sucesso' });
 
